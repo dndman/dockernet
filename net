@@ -1,0 +1,34 @@
+#!/bin/bash
+
+
+#создаем неймспейс для сети
+
+#ip netns add overlay-ns
+ip netns add my-vxlan
+
+
+#создаем бридж в неймспейсе, прикручиваем ему адрес и поднимаем его
+
+#ip netns exec overlay-ns ip link add dev br0 type bridge
+ip netns exec my-vxlan ip link add dev br-vxlan type bridge
+
+#ip netns exec overlay-ns ip addr add dev br0 192.168.0.1/24
+ip netns exec my-vxlan ip addr add dev br-vxlan 192.168.0.1/24
+
+#ip netns exec overlay-ns ip link set br0 up
+ip netns exec my-vxlan ip link set br-vxlan up
+
+#создаем vxlan интерфейс и подключаем к бриджу. важно не проебать номер сети(id, VID в конфиге)
+
+#ip link add dev vxlan1 type vxlan id 42 proxy learning dstport 4789
+ip link add dev vxlan1 type vxlan id 12345 proxy learning dstport 4789
+
+
+#ip link set vxlan1 netns overlay-ns
+ip link set vxlan1 netns my-vxlan
+
+#ip netns exec overlay-ns ip link set vxlan1 master br0
+ip netns exec my-vxlan ip link set vxlan1 master br-vxlan
+
+#ip netns exec overlay-ns ip link set vxlan1 up
+ip netns exec my-vxlan ip link set vxlan1 up
