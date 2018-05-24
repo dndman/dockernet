@@ -1,9 +1,32 @@
-docker network create -d overlay \
-  --subnet=192.168.0.0/16 \
-  --subnet=192.170.0.0/16 \
-  --gateway=192.168.0.100 \
-  --gateway=192.170.0.100 \
-  --ip-range=192.168.1.0/24 \
-  --aux-address="my-router=192.168.1.5" --aux-address="my-switch=192.168.1.6" \
-  --aux-address="my-printer=192.170.1.5" --aux-address="my-nas=192.170.1.6" \
-  MyOverlayNetwork
+#docker network create -d overlay \
+#  --subnet=192.168.0.0/16 \
+#  --subnet=192.170.0.0/16 \
+#  --gateway=192.168.0.100 \
+#  --gateway=192.170.0.100 \
+#  --ip-range=192.168.1.0/24 \
+#  --aux-address="my-router=192.168.1.5" --aux-address="my-switch=192.168.1.6" \
+#  --aux-address="my-printer=192.170.1.5" --aux-address="my-nas=192.170.1.6" \
+#  MyOverlayNetwork
+
+version: '2.1'
+
+services:
+  app:
+    image: nginx 1.13
+#    command: ifconfig
+    networks:
+      app_net:
+        ipv4_address: 172.110.110.101
+#        ipv6_address: 2001:3984:3989::10
+
+networks:
+  app_net:
+    driver: bridge
+#    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.110.110.0/24
+#        gateway: 172.110.110.1
+#      - subnet: 2001:3984:3989::/64
+#        gateway: 2001:3984:3989::1
